@@ -1,3 +1,3 @@
-module github.com/giantswarm/REPOSITORY_NAME
+module github.com/giantswarm/deletion-blocker-operator
 
 go 1.18
