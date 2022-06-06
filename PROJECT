@@ -1,0 +1,16 @@
+domain: giantswarm.io
+layout:
+- go.kubebuilder.io/v3
+projectName: deletion-blocker-operator
+repo: github.com/giantswarm/deletion-blocker-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: giantswarm.io
+  group: core
+  kind: DeletionBlock
+  path: github.com/giantswarm/deletion-blocker-operator/api/v1alpha1
+  version: v1alpha1
+version: "3"

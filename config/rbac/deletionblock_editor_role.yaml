@@ -1,0 +1,24 @@
+# permissions for end users to edit deletionblocks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: deletionblock-editor-role
+rules:
+- apiGroups:
+  - core.giantswarm.io
+  resources:
+  - deletionblocks
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.giantswarm.io
+  resources:
+  - deletionblocks/status
+  verbs:
+  - get
