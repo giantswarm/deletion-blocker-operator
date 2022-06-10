@@ -35,10 +35,31 @@ spec:
           spec:
             description: DeletionBlockSpec defines the desired state of DeletionBlock
             properties:
-              foo:
-                description: Foo is an example field of DeletionBlock. Edit deletionblock_types.go
-                  to remove/update
-                type: string
+              rule:
+                properties:
+                  dependent:
+                    properties:
+                      group:
+                        type: string
+                      kind:
+                        type: string
+                      version:
+                        type: string
+                    type: object
+                  managed:
+                    properties:
+                      group:
+                        type: string
+                      kind:
+                        type: string
+                      version:
+                        type: string
+                    type: object
+                  query:
+                    type: string
+                  type:
+                    type: string
+                type: object
             type: object
           status:
             description: DeletionBlockStatus defines the observed state of DeletionBlock

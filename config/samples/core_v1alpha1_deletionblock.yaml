@@ -1,6 +1,16 @@
 apiVersion: core.giantswarm.io/v1alpha1
 kind: DeletionBlock
 metadata:
-  name: deletionblock-sample
+  name: deletion-block-sample
 spec:
-  # TODO(user): Add fields here
+  rule:
+    type: IfNotExists
+    query: '{{ eq .dependent.spec.template.spec.bootstrap.configRef.name .managed.metadata.name }}'
+    managed:
+      group: bootstrap.cluster.x-k8s.io
+      version: v1beta1
+      kind: KubeadmConfigTemplate
+    dependent:
+      group: cluster.x-k8s.io
+      version: v1beta1
+      kind: MachineSet
