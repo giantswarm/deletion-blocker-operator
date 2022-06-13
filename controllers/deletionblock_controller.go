@@ -18,6 +18,8 @@ package controllers
 
 import (
 	"context"
+	"crypto/sha256"
+	"fmt"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -28,12 +30,14 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
+	"github.com/giantswarm/deletion-blocker-operator/pkg/key"
 	"github.com/giantswarm/microerror"
 
 	corev1alpha1 "github.com/giantswarm/deletion-blocker-operator/api/v1alpha1"
@@ -48,32 +52,17 @@ type DeletionBlockReconciler struct {
 	mgr manager.Manager
 	client.Client
 	Scheme   *runtime.Scheme
-	blockers map[string]chan struct{}
+	blockers map[string]context.CancelFunc
 }
 
 //+kubebuilder:rbac:groups=core.giantswarm.io,resources=deletionblocks,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=core.giantswarm.io,resources=deletionblocks/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=core.giantswarm.io,resources=deletionblocks/finalizers,verbs=update
 
-// Reconcile is part of the main kubernetes reconciliation loop which aims to
-// move the current state of the cluster closer to the desired state.
-// TODO(user): Modify the Reconcile function to compare the state specified by
-// the DeletionBlock object against the actual cluster state, and then
-// perform operations to make the cluster state reflect the state specified by
-// the user.
-//
-// For more details, check Reconcile and its Result here:
-// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.11.2/pkg/reconcile
 func (r *DeletionBlockReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	logger := log.FromContext(ctx)
-
-	log := logger.WithValues("name", req.Name, "namespace", req.NamespacedName)
-	log.Info("Reconciling")
-
-	client := r.mgr.GetClient()
-
-	ctx, cancel := context.WithTimeout(context.Background(), reconcileTimeout)
-	defer cancel()
+	logger = logger.WithValues("name", req.Name, "namespace", req.Namespace)
+	logger.Info("Reconciling")
 
 	var deletionBlock corev1alpha1.DeletionBlock
 	err := r.Get(ctx, req.NamespacedName, &deletionBlock)
@@ -84,86 +73,121 @@ func (r *DeletionBlockReconciler) Reconcile(ctx context.Context, req ctrl.Reques
 		return reconcile.Result{}, microerror.Mask(err)
 	}
 
-	log.Info("CR", "CR", deletionBlock)
-
-	log = log.WithValues(
-		"managed-kind", deletionBlock.Spec.Rule.Managed.Kind,
-		"managed-version", deletionBlock.Spec.Rule.Managed.Version)
-
-	if IsBeingDeleted(deletionBlock) {
-		if stop, running := r.blockers[deletionBlock.GetName()]; running {
-			// Shut down the controller that watches this experiment kind.
-			close(stop)
-			delete(r.blockers, deletionBlock.GetName())
-		}
-		// TODO(erkan)
-		// meta.RemoveFinalizer(e, "experiment")
-		if err := client.Update(ctx, &deletionBlock); err != nil {
-			log.Info("cannot remove finalizer", "error", err)
-			return reconcile.Result{}, errors.Wrap(err, "cannot remove finalizer")
-		}
-		return reconcile.Result{}, nil
+	if !deletionBlock.DeletionTimestamp.IsZero() {
+		return r.reconcileDelete(ctx, &deletionBlock, logger)
 	}
 
-	// TODO (erkan)
-	// meta.AddFinalizer(e, "experiment")
-	if err := client.Update(ctx, &deletionBlock); err != nil {
-		log.Info("cannot add finalizer", "error", err)
-		return reconcile.Result{}, errors.Wrap(err, "cannot add finalizer")
-	}
-
-	if _, running := r.blockers[deletionBlock.GetName()]; running {
-		// For the purposes of this example we assume experiments
-		// are immutable. We're already running, so there's nothing to do.
-		return reconcile.Result{}, nil
-	}
-
-	stop := make(chan struct{})
-	if err := runRule(r.mgr, deletionBlock, log, stop); err != nil {
-		log.Info("cannot run experiment", "error", err)
-		return reconcile.Result{}, errors.Wrap(err, "cannot stop experiment")
-	}
-	r.blockers[deletionBlock.GetName()] = stop
-
-	return reconcile.Result{}, nil
+	return r.reconcileNormal(ctx, &deletionBlock, logger)
 }
 
-func IsBeingDeleted(block corev1alpha1.DeletionBlock) bool {
-	return !block.DeletionTimestamp.IsZero()
+func (r *DeletionBlockReconciler) reconcileNormal(ctx context.Context, deletionBlock *corev1alpha1.DeletionBlock, logger logr.Logger) (ctrl.Result, error) {
+	// If the managed resource doesn't have the finalizer, add it.
+	if !controllerutil.ContainsFinalizer(deletionBlock, key.DeletionBlockerFinalizerName) {
+		controllerutil.AddFinalizer(deletionBlock, key.DeletionBlockerFinalizerName)
+		if err := r.Client.Update(ctx, deletionBlock); err != nil {
+			return reconcile.Result{}, microerror.Mask(err)
+		}
+	}
+
+	if _, exist := r.blockers[getUniqueName(deletionBlock)]; exist {
+		// DeletionBlock specs are immutable.
+		// A controller is already spawned for this CR. Nothing to do.
+		return reconcile.Result{}, nil
+	}
+
+	if err := r.spawnRuleController(deletionBlock, logger); err != nil {
+		logger.Info("cannot spawn a new controller", "error", err)
+		return reconcile.Result{}, errors.Wrap(err, "cannot spawn a new controller")
+	}
+
+	return ctrl.Result{}, nil
+}
+
+func (r *DeletionBlockReconciler) reconcileDelete(ctx context.Context, deletionBlock *corev1alpha1.DeletionBlock, logger logr.Logger) (ctrl.Result, error) {
+	if !controllerutil.ContainsFinalizer(deletionBlock, key.DeletionBlockerFinalizerName) {
+		return ctrl.Result{}, nil
+	}
+
+	if cancel, exist := r.blockers[getUniqueName(deletionBlock)]; exist {
+		// Shut down the spawned controller
+		cancel()
+		delete(r.blockers, getUniqueName(deletionBlock))
+	}
+
+	managedList := &unstructured.UnstructuredList{}
+	managedList.SetGroupVersionKind(deletionBlock.Spec.Rule.Managed.GetSchemaGroupVersionKind())
+	if err := r.Client.List(ctx, managedList, &client.ListOptions{}); err != nil {
+		return reconcile.Result{}, microerror.Mask(err)
+	}
+
+	uniqueFinalizer := getFinalizerNameWithHash(deletionBlock)
+	for _, managed := range managedList.Items {
+		controllerutil.RemoveFinalizer(&managed, uniqueFinalizer)
+		if err := r.Client.Update(ctx, &managed); err != nil {
+			logger.Info("cannot remove finalizer", "error", err)
+			return reconcile.Result{}, errors.Wrap(err, "cannot remove finalizer")
+		}
+	}
+
+	logger.Info("Removing finalizer.")
+	controllerutil.RemoveFinalizer(deletionBlock, key.DeletionBlockerFinalizerName)
+	if err := r.Client.Update(ctx, deletionBlock); err != nil {
+		logger.Info("cannot remove finalizer", "error", err)
+		return reconcile.Result{}, errors.Wrap(err, "cannot remove finalizer")
+	}
+
+	return reconcile.Result{}, nil
 }
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *DeletionBlockReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	r.mgr = mgr
-	r.blockers = make(map[string]chan struct{})
+	r.blockers = make(map[string]context.CancelFunc)
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&corev1alpha1.DeletionBlock{}).
 		Complete(r)
 }
 
-func runRule(m ctrl.Manager, deletionBlock corev1alpha1.DeletionBlock, l logr.Logger, stop <-chan struct{}) error {
-	o := controller.Options{
-		Reconciler: &RuleReconciler{client: m.GetClient(), log: l, DeletionBlockRule: deletionBlock.Spec.Rule},
+func (r *DeletionBlockReconciler) spawnRuleController(deletionBlock *corev1alpha1.DeletionBlock, l logr.Logger) error {
+	options := controller.Options{
+		Reconciler: &RuleReconciler{
+			client:            r.mgr.GetClient(),
+			log:               l,
+			DeletionBlockRule: deletionBlock.Spec.Rule,
+			Finalizer:         getFinalizerNameWithHash(deletionBlock),
+		},
 	}
 
-	managed := deletionBlock.Spec.Rule.Managed
-	c, err := controller.New("deletionrule/"+managed.Kind, m, o)
+	c, err := controller.NewUnmanaged("deletionrule/"+getUniqueName(deletionBlock), r.mgr, options)
 	if err != nil {
+		l.Error(err, "unable to create controller")
 		return err
 	}
 
 	u := &unstructured.Unstructured{}
-	u.SetGroupVersionKind(managed.GetSchemaGroupVersionKind())
+	u.SetGroupVersionKind(deletionBlock.Spec.Rule.Managed.GetSchemaGroupVersionKind())
 	if err := c.Watch(&source.Kind{Type: u}, &handler.EnqueueRequestForObject{}); err != nil {
 		return err
 	}
 
+	ctx, cancel := context.WithCancel(context.Background())
 	go func() {
-		<-m.Elected()
-		if err := c.Start(context.TODO()); err != nil {
-			l.Info("cannot run experiment controller", "error", err)
+		<-r.mgr.Elected()
+		if err := c.Start(ctx); err != nil {
+			l.Info("cannot spawn a controller", "error", err)
 		}
 	}()
 
+	r.blockers[getUniqueName(deletionBlock)] = cancel
 	return nil
+}
+
+func getUniqueName(block *corev1alpha1.DeletionBlock) string {
+	return block.Namespace + "/" + block.Name
+}
+
+func getFinalizerNameWithHash(block *corev1alpha1.DeletionBlock) string {
+	hash := sha256.Sum256([]byte(getUniqueName(block)))
+	suffix := string(hash[0:4])
+	return fmt.Sprintf("%s.%x", key.DeletionBlockerFinalizerName, suffix)
 }

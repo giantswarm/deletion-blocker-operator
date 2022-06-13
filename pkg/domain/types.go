@@ -8,6 +8,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 )
 
+const (
+	IfNotExistsRule       = "IfNotExists"
+	ManagedVariableName   = "managed"
+	DependentVariableName = "dependent"
+)
+
 type GroupVersionKind struct {
 	Group   string `json:"group,omitempty"`
 	Version string `json:"version,omitempty"`
@@ -21,35 +27,38 @@ type DeletionBlockRule struct {
 	Dependent GroupVersionKind `json:"dependent,omitempty"`
 }
 
-func (dbr DeletionBlockRule) CheckIsDeletionAllowed(managed unstructured.Unstructured, dependents unstructured.UnstructuredList) bool {
-	if dbr.Type == "IfNotExists" {
+func (dbr DeletionBlockRule) CheckIsDeletionAllowed(managed unstructured.Unstructured, dependents unstructured.UnstructuredList) (bool, error) {
+	if dbr.Type == IfNotExistsRule {
 		for _, d := range dependents.Items {
-			if !dbr.CheckIsDeletionAllowedForASingleDependent(managed, d) {
-				return false
+			allowed, err := dbr.CheckIsDeletionAllowedForASingleDependent(managed, d)
+			if err != nil || allowed == false {
+				return false, err
 			}
 		}
 	}
 
-	return true
+	return true, nil
 }
 
-func (dbr DeletionBlockRule) CheckIsDeletionAllowedForASingleDependent(managed unstructured.Unstructured, dependent unstructured.Unstructured) bool {
+func (dbr DeletionBlockRule) CheckIsDeletionAllowedForASingleDependent(managed unstructured.Unstructured, dependent unstructured.Unstructured) (bool, error) {
 	tmpl, err := template.New("rule").Parse(dbr.Query)
 	if err != nil {
-		panic(err)
+		return false, err
 	}
-	data := map[string]interface{}{
-		"managed":   managed.Object,
-		"dependent": dependent.Object,
-	}
-	var tpl bytes.Buffer
-	err = tmpl.Execute(&tpl, data)
-	if err != nil {
-		panic(err)
-	}
-	result := tpl.String()
 
-	return result == "true"
+	data := map[string]interface{}{
+		ManagedVariableName:   managed.Object,
+		DependentVariableName: dependent.Object,
+	}
+
+	var buf bytes.Buffer
+	err = tmpl.Execute(&buf, data)
+	if err != nil {
+		return false, err
+	}
+	result := buf.String()
+
+	return result != "true", nil
 }
 
 func (k GroupVersionKind) GetSchemaGroupVersionKind() schema.GroupVersionKind {

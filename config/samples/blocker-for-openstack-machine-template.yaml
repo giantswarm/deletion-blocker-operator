@@ -1,0 +1,16 @@
+apiVersion: core.giantswarm.io/v1alpha1
+kind: DeletionBlock
+metadata:
+  name: blocker-for-openstack-machine-template
+spec:
+  rule:
+    type: IfNotExists
+    query: '{{ eq .dependent.spec.template.spec.infrastructureRef.name .managed.metadata.name }}'
+    managed:
+      group: infrastructure.cluster.x-k8s.io
+      version: v1alpha5
+      kind: OpenStackMachineTemplate
+    dependent:
+      group: cluster.x-k8s.io
+      version: v1beta1
+      kind: MachineSet

@@ -1,7 +1,7 @@
 apiVersion: core.giantswarm.io/v1alpha1
 kind: DeletionBlock
 metadata:
-  name: deletion-block-sample
+  name: blocker-for-kubeadm-config-template
 spec:
   rule:
     type: IfNotExists
