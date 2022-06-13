@@ -1,0 +1,16 @@
+project:
+  branch: "[[ .Branch ]]"
+  commit: "[[ .SHA ]]"
+image:
+  name: "giantswarm/deletion-blocker-operator"
+  tag: "[[ .Version ]]"
+registry:
+  domain: docker.io
+
+logLevel: 0
+
+pod:
+  user:
+    id: 1000
+  group:
+    id: 1000
