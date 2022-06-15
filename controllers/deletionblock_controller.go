@@ -37,8 +37,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 	"sigs.k8s.io/controller-runtime/pkg/source"
 
-	"github.com/giantswarm/deletion-blocker-operator/pkg/key"
 	"github.com/giantswarm/microerror"
+
+	"github.com/giantswarm/deletion-blocker-operator/pkg/key"
 
 	corev1alpha1 "github.com/giantswarm/deletion-blocker-operator/api/v1alpha1"
 )
@@ -121,9 +122,10 @@ func (r *DeletionBlockReconciler) reconcileDelete(ctx context.Context, deletionB
 	}
 
 	uniqueFinalizer := getFinalizerNameWithHash(deletionBlock)
-	for _, managed := range managedList.Items {
-		controllerutil.RemoveFinalizer(&managed, uniqueFinalizer)
-		if err := r.Client.Update(ctx, &managed); err != nil {
+	for index := range managedList.Items {
+		managed := &managedList.Items[index]
+		controllerutil.RemoveFinalizer(managed, uniqueFinalizer)
+		if err := r.Client.Update(ctx, managed); err != nil {
 			logger.Info("cannot remove finalizer", "error", err)
 			return reconcile.Result{}, errors.Wrap(err, "cannot remove finalizer")
 		}

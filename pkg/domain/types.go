@@ -31,7 +31,7 @@ func (dbr DeletionBlockRule) CheckIsDeletionAllowed(managed unstructured.Unstruc
 	if dbr.Type == IfNotExistsRule {
 		for _, d := range dependents.Items {
 			allowed, err := dbr.CheckIsDeletionAllowedForASingleDependent(managed, d)
-			if err != nil || allowed == false {
+			if err != nil || !allowed {
 				return false, err
 			}
 		}

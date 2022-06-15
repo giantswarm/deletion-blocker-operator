@@ -14,8 +14,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/giantswarm/deletion-blocker-operator/pkg/domain"
 	"github.com/giantswarm/microerror"
+
+	"github.com/giantswarm/deletion-blocker-operator/pkg/domain"
 )
 
 type RuleReconciler struct {
@@ -28,7 +29,7 @@ type RuleReconciler struct {
 
 func (r *RuleReconciler) Reconcile(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
 	logger := log.FromContext(ctx)
-	logger = r.log.WithValues("name", req.Name, "namespace", req.Namespace)
+	logger = logger.WithValues("name", req.Name, "namespace", req.Namespace)
 	logger.Info("Reconciling")
 
 	ctx, cancel := context.WithTimeout(context.Background(), reconcileTimeout)
