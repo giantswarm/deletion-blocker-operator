@@ -4,32 +4,28 @@ A helper operator to block deletion of k8s objects by managing finalizers based 
 ## Why is it necessary?
 Unfortunately all operators don't take advantage of `finalizers`. When you delete some CRs, they stop working for 
 some other CRs. You need to ensure that you don't delete CRs who have some dependents. This operator allows you to 
-define those dependencies via a Custom Resource so that you can block deletion of necessary CRs until some 
+define those dependencies via some rules so that you can block deletion of necessary CRs until some 
 conditions met.
 
-## How to use?
+## How does it work?
 
-Current implementation only supports `IfNotExits` queries. If there is one dependent who matches the `query`, 
-deletion is blocked with a unique finalizer for the CR.  
-
-```yaml
-apiVersion: core.giantswarm.io/v1alpha1
-kind: DeletionBlock
-metadata:
-  name: blocker-for-kubeadm-config-template
-spec:
-  rule:
-    type: IfNotExists
-    query: '{{ eq .dependent.spec.template.spec.bootstrap.configRef.name .managed.metadata.name }}'
+The helm chart requires `rules`. The chart creates a configmap on which the operator is mounted and also the chart 
+creates necessary RBACs for the operator.
+```
+rules:
+  - query: '{{ eq .dependent.spec.template.spec.bootstrap.configRef.name .managed.metadata.name }}'
     managed:
       group: bootstrap.cluster.x-k8s.io
       version: v1beta1
       kind: KubeadmConfigTemplate
+      resource: kubeadmconfigtemplates
     dependent:
       group: cluster.x-k8s.io
       version: v1beta1
       kind: MachineSet
+      resource: machinesets
 ```
+
 ## License
 
 Copyright 2022.
