@@ -6,32 +6,6 @@ metadata:
   {{- include "labels.common" . | nindent 4 }}
 rules:
 - apiGroups:
-    - core.giantswarm.io
-  resources:
-    - deletionblocks
-  verbs:
-    - create
-    - delete
-    - get
-    - list
-    - patch
-    - update
-    - watch
-- apiGroups:
-    - core.giantswarm.io
-  resources:
-    - deletionblocks/finalizers
-  verbs:
-    - update
-- apiGroups:
-    - core.giantswarm.io
-  resources:
-    - deletionblocks/status
-  verbs:
-    - get
-    - patch
-    - update
-- apiGroups:
   - coordination.k8s.io
   resources:
   - leases
@@ -73,15 +47,25 @@ rules:
   - get
   - watch
   - list
+{{- range .Values.rules }}
 - apiGroups:
-    - '*'
+  - {{.managed.group}}
   resources:
-    - '*'
+  - {{.managed.resource}}
   verbs:
-    - get
-    - list
-    - watch
-    - update
+  - get
+  - list
+  - watch
+  - update
+- apiGroups:
+  - {{.dependent.group}}
+  resources:
+  - {{.dependent.resource}}
+  verbs:
+  - get
+  - list
+  - watch
+{{- end }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

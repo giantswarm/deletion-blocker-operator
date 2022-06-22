@@ -2,12 +2,16 @@ package controllers
 
 import (
 	"context"
+	"crypto/sha256"
+	"fmt"
 	"time"
 
+	"github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
 	"github.com/pkg/errors"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
@@ -16,28 +20,27 @@ import (
 
 	"github.com/giantswarm/microerror"
 
-	"github.com/giantswarm/deletion-blocker-operator/pkg/domain"
+	"github.com/giantswarm/deletion-blocker-operator/pkg/rules"
 )
 
 type RuleReconciler struct {
-	client client.Client
-	log    logr.Logger
+	client.Client
+	Scheme *runtime.Scheme
 
-	DeletionBlockRule domain.DeletionBlockRule
+	DeletionBlockRule rules.DeletionBlock
 	Finalizer         string
 }
+
+const finalizerPrefix = "deletion-blocker-operator.finalizers.giantswarm.io"
 
 func (r *RuleReconciler) Reconcile(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
 	logger := log.FromContext(ctx)
 	logger = logger.WithValues("name", req.Name, "namespace", req.Namespace)
 	logger.Info("Reconciling")
 
-	ctx, cancel := context.WithTimeout(context.Background(), reconcileTimeout)
-	defer cancel()
-
 	managed := &unstructured.Unstructured{}
 	managed.SetGroupVersionKind(r.DeletionBlockRule.Managed.GetSchemaGroupVersionKind())
-	if err := r.client.Get(ctx, req.NamespacedName, managed); err != nil {
+	if err := r.Client.Get(ctx, req.NamespacedName, managed); err != nil {
 		return reconcile.Result{}, errors.Wrap(IgnoreNotFound(err), "cannot get Rule ")
 	}
 
@@ -54,11 +57,12 @@ func (r *RuleReconciler) reconcileNormal(ctx context.Context, logger logr.Logger
 	// If the managed resource doesn't have the finalizer, add it.
 	if !controllerutil.ContainsFinalizer(managed, r.Finalizer) {
 		controllerutil.AddFinalizer(managed, r.Finalizer)
-		if err := r.client.Update(ctx, managed); err != nil {
+		if err := r.Client.Update(ctx, managed); err != nil {
 			return reconcile.Result{}, microerror.Mask(err)
 		}
 	}
 
+	// nothing other than adding finalizer
 	return reconcile.Result{}, nil
 }
 
@@ -69,7 +73,7 @@ func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger
 
 	dependents := &unstructured.UnstructuredList{}
 	dependents.SetGroupVersionKind(r.DeletionBlockRule.Dependent.GetSchemaGroupVersionKind())
-	if err := r.client.List(ctx, dependents, &client.ListOptions{Namespace: managed.GetNamespace()}); err != nil {
+	if err := r.Client.List(ctx, dependents, &client.ListOptions{Namespace: managed.GetNamespace()}); err != nil {
 		return reconcile.Result{}, microerror.Mask(IgnoreNotFound(err))
 	}
 
@@ -81,12 +85,12 @@ func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger
 	if allowed {
 		logger.Info("We can delete the finalizer. Removing finalizer")
 		controllerutil.RemoveFinalizer(managed, r.Finalizer)
-		if err := r.client.Update(ctx, managed); err != nil {
+		if err := r.Client.Update(ctx, managed); err != nil {
 			return reconcile.Result{}, microerror.Mask(err)
 		}
 		return ctrl.Result{}, nil
 	} else {
-		return ctrl.Result{RequeueAfter: time.Second * 10}, nil
+		return ctrl.Result{RequeueAfter: time.Minute * 1}, nil
 	}
 
 }
@@ -98,4 +102,21 @@ func IgnoreNotFound(err error) error {
 		return nil
 	}
 	return err
+}
+
+// SetupWithManager sets up the controller with the Manager.
+func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
+	r.Finalizer = buildUniqueFinalizer(r.DeletionBlockRule)
+	u := &unstructured.Unstructured{}
+	u.SetGroupVersionKind(r.DeletionBlockRule.Managed.GetSchemaGroupVersionKind())
+	return ctrl.NewControllerManagedBy(mgr).
+		For(u).
+		Complete(r)
+}
+
+func buildUniqueFinalizer(rule rules.DeletionBlock) string {
+	ruleAsYaml, _ := yaml.Marshal(rule)
+	hash := sha256.Sum256(ruleAsYaml)
+	suffix := string(hash[0:4])
+	return fmt.Sprintf("%s.%x", finalizerPrefix, suffix)
 }

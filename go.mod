@@ -3,6 +3,7 @@ module github.com/giantswarm/deletion-blocker-operator
 go 1.17
 
 require (
+	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/microerror v0.4.0
 	github.com/go-logr/logr v1.2.0
 	github.com/pkg/errors v0.9.1

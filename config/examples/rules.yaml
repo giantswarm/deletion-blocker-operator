@@ -1,0 +1,22 @@
+- query: '{{ eq .dependent.spec.template.spec.bootstrap.configRef.name .managed.metadata.name }}'
+  managed:
+    group: bootstrap.cluster.x-k8s.io
+    version: v1beta1
+    kind: KubeadmConfigTemplate
+    resources: kubeadmconfigtemplates
+  dependent:
+    group: cluster.x-k8s.io
+    version: v1beta1
+    kind: MachineSet
+    resources: machinesets
+- query: '{{ eq .dependent.spec.template.spec.infrastructureRef.name .managed.metadata.name }}'
+  managed:
+    group: infrastructure.cluster.x-k8s.io
+    version: v1alpha5
+    kind: OpenStackMachineTemplate
+    resource: openstackmachinetemplates
+  dependent:
+    group: cluster.x-k8s.io
+    version: v1beta1
+    kind: MachineSet
+    resource: machinesets

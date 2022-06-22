@@ -1,4 +1,4 @@
-package domain
+package rules
 
 import (
 	"bytes"
@@ -9,7 +9,6 @@ import (
 )
 
 const (
-	IfNotExistsRule       = "IfNotExists"
 	ManagedVariableName   = "managed"
 	DependentVariableName = "dependent"
 )
@@ -20,27 +19,24 @@ type GroupVersionKind struct {
 	Kind    string `json:"kind,omitempty"`
 }
 
-type DeletionBlockRule struct {
-	Type      string           `json:"type,omitempty"`
+type DeletionBlock struct {
 	Query     string           `json:"query,omitempty"`
 	Managed   GroupVersionKind `json:"managed,omitempty"`
 	Dependent GroupVersionKind `json:"dependent,omitempty"`
 }
 
-func (dbr DeletionBlockRule) CheckIsDeletionAllowed(managed unstructured.Unstructured, dependents unstructured.UnstructuredList) (bool, error) {
-	if dbr.Type == IfNotExistsRule {
-		for _, d := range dependents.Items {
-			allowed, err := dbr.CheckIsDeletionAllowedForASingleDependent(managed, d)
-			if err != nil || !allowed {
-				return false, err
-			}
+func (dbr DeletionBlock) CheckIsDeletionAllowed(managed unstructured.Unstructured, dependents unstructured.UnstructuredList) (bool, error) {
+	for _, d := range dependents.Items {
+		allowed, err := dbr.CheckIsDependent(managed, d)
+		if err != nil || !allowed {
+			return false, err
 		}
 	}
 
 	return true, nil
 }
 
-func (dbr DeletionBlockRule) CheckIsDeletionAllowedForASingleDependent(managed unstructured.Unstructured, dependent unstructured.Unstructured) (bool, error) {
+func (dbr DeletionBlock) CheckIsDependent(managed unstructured.Unstructured, dependent unstructured.Unstructured) (bool, error) {
 	tmpl, err := template.New("rule").Parse(dbr.Query)
 	if err != nil {
 		return false, err
