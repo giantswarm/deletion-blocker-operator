@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/microerror v0.4.0
-	github.com/go-logr/logr v1.2.0
+	github.com/go-logr/logr v1.2.2
 	github.com/pkg/errors v0.9.1
 	k8s.io/apimachinery v0.23.5
 	k8s.io/client-go v0.23.5
@@ -70,3 +70,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+
+replace github.com/pkg/sftp v1.10.1 => github.com/pkg/sftp v1.13.4
