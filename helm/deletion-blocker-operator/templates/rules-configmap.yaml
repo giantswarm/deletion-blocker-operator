@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deletion-blocker-operator-rules
+  namespace: {{ include "resource.default.namespace"  . }}
+data:
+  rules.yaml: |-
+    {{- .Values.rules |toYaml | nindent 4 -}}

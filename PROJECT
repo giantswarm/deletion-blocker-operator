@@ -1,0 +1,6 @@
+domain: giantswarm.io
+layout:
+- go.kubebuilder.io/v3
+projectName: deletion-blocker-operator
+repo: github.com/giantswarm/deletion-blocker-operator
+version: "3"

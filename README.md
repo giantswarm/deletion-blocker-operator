@@ -1,30 +1,44 @@
-[![CircleCI](https://circleci.com/gh/giantswarm/deletion-blocker-operator.svg?style=shield)](https://circleci.com/gh/giantswarm/deletion-blocker-operator)
-
 # deletion-blocker-operator
+A helper operator to block deletion of k8s objects by managing finalizers based on some defined rules
 
-This is a deletion-blocker-operator repository containing some basic files every repository
-needs.
+## Why is it necessary?
+Unfortunately all operators don't take advantage of `finalizers`. When you delete some CRs, they stop working for 
+some other CRs. You need to ensure that you don't delete CRs who have some dependents. This operator allows you to 
+define those dependencies via some rules so that you can block deletion of necessary CRs until some 
+conditions met.
 
-To use it just hit `Use this deletion-blocker-operator` button or [this link][generate].
+## How does it work?
 
-Things to do with your newly created repo:
+The helm chart requires `rules`. The chart creates a configmap on which the operator is mounted and also the chart 
+creates necessary RBACs for the operator.
+```
+rules:
+  - query: '{{ eq .dependent.spec.template.spec.bootstrap.configRef.name .managed.metadata.name }}'
+    managed:
+      group: bootstrap.cluster.x-k8s.io
+      version: v1beta1
+      kind: KubeadmConfigTemplate
+      resource: kubeadmconfigtemplates
+    dependent:
+      group: cluster.x-k8s.io
+      version: v1beta1
+      kind: MachineSet
+      resource: machinesets
+```
 
-1. Run`devctl replace -i "deletion-blocker-operator" "$(basename $(git rev-parse
-   --show-toplevel))" --ignore '.git/**' '**'`.
-2. Run `devctl replace -i "deletion-blocker-operator" "$(basename $(git rev-parse
-   --show-toplevel))" --ignore '.git/**' '**'`.
-3. Go to https://github.com/giantswarm/deletion-blocker-operator/settings and make sure `Allow
-   merge commits` box is unchecked and `Automatically delete head branches` box
-   is checked.
-4. Go to https://github.com/giantswarm/deletion-blocker-operator/settings/access and add
-   `giantswarm/bots` with `Write` access and `giantswarm/employees` with
-   `Admin` access.
-5. Add this repository to https://github.com/giantswarm/github.
-6. Create quay.io docker repository if needed.
-7. Add the project to the CircleCI:
-   https://circleci.com/setup-project/gh/giantswarm/deletion-blocker-operator
-8. Change the badge (with style=shield):
-   https://circleci.com/gh/giantswarm/deletion-blocker-operator.svg?style=shield&circle-token=TOKEN_FOR_PRIVATE_REPO
-   If this is a private repository token with scope `status` will be needed.
+## License
 
-[generate]: https://github.com/giantswarm/deletion-blocker-operator/generate
+Copyright 2022.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+

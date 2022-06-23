@@ -1,0 +1,33 @@
+project:
+  branch: "[[ .Branch ]]"
+  commit: "[[ .SHA ]]"
+image:
+  name: "giantswarm/deletion-blocker-operator"
+  tag: "[[ .Version ]]"
+registry:
+  domain: docker.io
+
+logLevel: 0
+
+pod:
+  user:
+    id: 1000
+  group:
+    id: 1000
+
+rules: []
+# rules:
+#
+# Example rule
+#
+#  - query: '{{ eq .dependent.spec.template.spec.bootstrap.configRef.name .managed.metadata.name }}'
+#    managed:
+#      group: bootstrap.cluster.x-k8s.io
+#      version: v1beta1
+#      kind: KubeadmConfigTemplate
+#      resource: kubeadmconfigtemplates
+#    dependent:
+#      group: cluster.x-k8s.io
+#      version: v1beta1
+#      kind: MachineSet
+#      resource: machinesets
