@@ -81,15 +81,15 @@ func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger
 	if err != nil {
 		return reconcile.Result{}, microerror.Mask(IgnoreNotFound(err))
 	}
-	logger.Info("Deletion is", "allowed:", allowed)
 	if allowed {
-		logger.Info("We can delete the finalizer. Removing finalizer")
+		logger.Info("Deletion is allowed. Removing the finalizer.")
 		controllerutil.RemoveFinalizer(managed, r.Finalizer)
 		if err := r.Client.Update(ctx, managed); err != nil {
 			return reconcile.Result{}, microerror.Mask(err)
 		}
 		return ctrl.Result{}, nil
 	} else {
+		logger.Info("Deletion is not allowed.")
 		return ctrl.Result{RequeueAfter: time.Minute * 1}, nil
 	}
 
