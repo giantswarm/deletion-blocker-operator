@@ -15,7 +15,8 @@ pod:
   group:
     id: 1000
 
-#rules:
+rules: []
+# rules:
 #
 # Example rule
 #
