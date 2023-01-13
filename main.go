@@ -18,7 +18,6 @@ package main
 
 import (
 	"flag"
-	"io/ioutil"
 	"os"
 
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -117,7 +116,7 @@ func main() {
 }
 
 func readRulesFromFile(filePath string) ([]rules.DeletionBlock, error) {
-	data, err := ioutil.ReadFile(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, err
 	}
