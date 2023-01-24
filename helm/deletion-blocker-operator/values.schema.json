@@ -11,11 +11,7 @@
                 "tag": {
                     "type": "string"
                 }
-            },
-            "required": [
-                "name",
-                "tag"
-            ]
+            }
         },
         "logLevel": {
             "type": "integer"
@@ -39,11 +35,20 @@
                         }
                     }
                 }
-            },
-            "required": [
-                "group",
-                "user"
-            ]
+            }
+        },
+        "podSecurityContext": {
+            "type": "object",
+            "properties": {
+                "seccompProfile": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
         },
         "project": {
             "type": "object",
@@ -54,11 +59,7 @@
                 "commit": {
                     "type": "string"
                 }
-            },
-            "required": [
-                "branch",
-                "commit"
-            ]
+            }
         },
         "registry": {
             "type": "object",
@@ -66,80 +67,23 @@
                 "domain": {
                     "type": "string"
                 }
-            },
-            "required": [
-                "domain"
-            ]
+            }
         },
         "rules": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "dependent": {
-                        "type": "object",
-                        "properties": {
-                            "group": {
-                                "type": "string"
-                            },
-                            "kind": {
-                                "type": "string"
-                            },
-                            "resource": {
-                                "type": "string"
-                            },
-                            "version": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "group",
-                            "kind",
-                            "resource",
-                            "version"
-                        ]
-                    },
-                    "managed": {
-                        "type": "object",
-                        "properties": {
-                            "group": {
-                                "type": "string"
-                            },
-                            "kind": {
-                                "type": "string"
-                            },
-                            "resource": {
-                                "type": "string"
-                            },
-                            "version": {
-                                "type": "string"
-                            }
-                        },
-                        "required": [
-                            "group",
-                            "kind",
-                            "resource",
-                            "version"
-                        ]
-                    },
-                    "query": {
-                        "type": "string"
+            "type": "array"
+        },
+        "securityContext": {
+            "type": "object",
+            "properties": {
+                "seccompProfile": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
                     }
-                },
-                "required": [
-                    "dependent",
-                    "managed",
-                    "query"
-                ]
+                }
             }
         }
-    },
-    "required": [
-        "image",
-        "logLevel",
-        "pod",
-        "project",
-        "registry",
-        "rules"
-    ]
+    }
 }
