@@ -24,6 +24,9 @@ spec:
       securityContext:
         runAsUser: {{ .Values.pod.user.id }}
         runAsGroup: {{ .Values.pod.group.id }}
+        {{- with .Values.podSecurityContext }}
+          {{- . | toYaml | nindent 8 }}
+        {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.registry.domain }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
@@ -32,6 +35,10 @@ spec:
         args:
         - --leader-elect
         - --rules-file-path=/tmp/rules.yaml
+        securityContext:
+          {{- with .Values.securityContext }}
+            {{- . | toYaml | nindent 10 }}
+          {{- end }}
         resources:
           requests:
             cpu: 100m
