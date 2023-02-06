@@ -45,6 +45,19 @@
                 "user"
             ]
         },
+        "podSecurityContext": {
+            "type": "object",
+            "properties": {
+                "seccompProfile": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "project": {
             "type": "object",
             "properties": {
@@ -131,6 +144,19 @@
                     "managed",
                     "query"
                 ]
+            }
+        },
+        "securityContext": {
+            "type": "object",
+            "properties": {
+                "seccompProfile": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     },
