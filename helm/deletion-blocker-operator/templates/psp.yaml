@@ -24,6 +24,13 @@ spec:
     rule: RunAsAny
   supplementalGroups:
     rule: RunAsAny
+  volumes:
+  - emptyDir
+  - secret
+  - downwardAPI
+  - configMap
+  - persistentVolumeClaim
+  - projected
   allowPrivilegeEscalation: false
   hostNetwork: false
   hostIPC: false
