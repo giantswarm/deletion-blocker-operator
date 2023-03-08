@@ -1,6 +1,6 @@
 # DO NOT EDIT. Generated with:
 #
-#    devctl@5.14.0
+#    devctl@5.19.0
 #
 version: 2
 updates:
@@ -11,7 +11,7 @@ updates:
       time: "04:00"
     open-pull-requests-limit: 10
     reviewers:
-      - giantswarm/area-kaas
+      - giantswarm/team-rocket
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
@@ -19,7 +19,7 @@ updates:
       time: "04:00"
     open-pull-requests-limit: 10
     reviewers:
-      - giantswarm/area-kaas
+      - giantswarm/team-rocket
     ignore:
       - dependency-name: zricethezav/gitleaks-action
       - dependency-name: actions/setup-go
@@ -30,7 +30,7 @@ updates:
       time: "04:00"
     open-pull-requests-limit: 10
     reviewers:
-      - giantswarm/area-kaas
+      - giantswarm/team-rocket
     ignore:
       - dependency-name: k8s.io/*
         versions:
