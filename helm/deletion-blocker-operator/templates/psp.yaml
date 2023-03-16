@@ -25,12 +25,10 @@ spec:
   supplementalGroups:
     rule: RunAsAny
   volumes:
-  - emptyDir
-  - secret
-  - downwardAPI
-  - configMap
-  - persistentVolumeClaim
-  - projected
+    # Used directly in deployment
+    - configMap
+    # Needed for Kubernetes API access (https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/)
+    - projected
   allowPrivilegeEscalation: false
   hostNetwork: false
   hostIPC: false
