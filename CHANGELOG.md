@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Push to Vsphere and Cloud Director app collection. Don't push to Openstack app collection.
+
 ## [0.1.3] - 2023-03-16
 
 ### Added
