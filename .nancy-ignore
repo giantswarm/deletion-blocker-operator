@@ -2,4 +2,5 @@
 sonatype-2022-6522 until=2023-06-01
 
 # there is no available fix yet
-CVE-2020-8561 until=2023-05-01
+# Externally Controlled Reference to a Resource in Another Sphere
+CVE-2020-8561
