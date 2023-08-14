@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/microerror v0.4.0
-	github.com/go-logr/logr v1.2.3
+	github.com/go-logr/logr v1.2.4
 	github.com/pkg/errors v0.9.1
 	k8s.io/apimachinery v0.26.1
 	k8s.io/client-go v0.26.1
