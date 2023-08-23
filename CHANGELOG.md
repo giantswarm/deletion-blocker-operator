@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Push to Vsphere and Cloud Director app collection. Don't push to Openstack app collection.
 - Re-ignore CVE-2020-8561
 - Add ignore for CVE-2023-29401
+- Fix security issues reported by kyverno policies.
 
 ## [0.1.3] - 2023-03-16
 
