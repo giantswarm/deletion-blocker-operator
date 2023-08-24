@@ -36,8 +36,13 @@ rules: []
 podSecurityContext:
   seccompProfile:
     type: RuntimeDefault
+  runAsNonRoot: true
 
 # Add seccomp to container security context
 securityContext:
+  allowPrivilegeEscalation: false
   seccompProfile:
     type: RuntimeDefault
+  capabilities:
+    drop:
+      - ALL
