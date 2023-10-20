@@ -48,9 +48,9 @@ require (
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.5.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	golang.org/x/term v0.10.0 // indirect
-	golang.org/x/text v0.11.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.3.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
@@ -74,6 +74,6 @@ replace (
 	github.com/pkg/sftp v1.10.1 => github.com/pkg/sftp v1.13.4
 	github.com/prometheus/client_golang v1.11.0 => github.com/prometheus/client_golang v1.11.1
 
-	// CVE-2023-3978
-	golang.org/x/net => golang.org/x/net v0.13.0
+	// CVE-2023-3978 and CVE-2023-39325
+	golang.org/x/net => golang.org/x/net v0.17.0
 )
