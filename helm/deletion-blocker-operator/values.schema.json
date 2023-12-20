@@ -156,7 +156,15 @@
                     "type": "boolean"
                 },
                 "capabilities": {
-                    "type": "object"
+                    "type": "object",
+                    "properties": {
+                        "drop": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 },
                 "seccompProfile": {
                     "type": "object",

@@ -5,7 +5,7 @@ image:
   name: "giantswarm/deletion-blocker-operator"
   tag: "[[ .Version ]]"
 registry:
-  domain: docker.io
+  domain: gsoci.azurecr.io
 
 logLevel: 0
 
