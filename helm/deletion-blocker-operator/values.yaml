@@ -46,3 +46,7 @@ securityContext:
   capabilities:
     drop:
       - ALL
+
+global:
+  podSecurityStandards:
+    enforced: false

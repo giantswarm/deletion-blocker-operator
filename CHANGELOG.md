@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Configure `gsoci.azurecr.io` as the default container image registry.
+- Add switch to PSPs for 1.25.
 
 ## [0.1.4] - 2023-08-24
 
