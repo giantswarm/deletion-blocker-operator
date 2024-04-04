@@ -70,6 +70,8 @@ require (
 )
 
 replace (
+	// CVE-2024-24786
+	github.com/golang/protobuf => github.com/golang/protobuf v1.5.4
 	github.com/miekg/dns v1.0.14 => github.com/miekg/dns v1.1.25
 	github.com/pkg/sftp v1.10.1 => github.com/pkg/sftp v1.13.4
 	github.com/prometheus/client_golang v1.11.0 => github.com/prometheus/client_golang v1.11.1
