@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Bug: bump protobuf module to avoid CVE-2024-24786.
+- Update renovate to json5 config.
 
 ## [0.2.0] - 2024-01-17
 
