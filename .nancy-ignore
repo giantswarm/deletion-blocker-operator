@@ -1,10 +1,1 @@
-# k8s.io/apiserver@v0.26.0
-sonatype-2022-6522 until=2023-06-01
 
-# there is no available fix yet
-# Externally Controlled Reference to a Resource in Another Sphere
-CVE-2020-8561
-
-# gRPC HTTP2 header size exceeded error
-CVE-2023-29401
-CVE-2023-32731
