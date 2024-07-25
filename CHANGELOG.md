@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Bug: bump protobuf module to avoid CVE-2024-24786.
 - Update renovate to json5 config.
+- Upgrade `k8s.io/client-go` and `k8s.io/apimachinery` from `0.27.2` to `0.29.2`
+- Upgrade `sigs.k8s.io/controller-runtime` from `0.15.1` to `0.17.3`
 
 ## [0.2.0] - 2024-01-17
 
