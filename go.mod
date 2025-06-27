@@ -9,9 +9,9 @@ require (
 	github.com/giantswarm/microerror v0.4.1
 	github.com/go-logr/logr v1.4.2
 	github.com/pkg/errors v0.9.1
-	k8s.io/apimachinery v0.29.2
-	k8s.io/client-go v0.29.2
-	sigs.k8s.io/controller-runtime v0.17.3
+	k8s.io/apimachinery v0.33.2
+	k8s.io/client-go v0.33.2
+	sigs.k8s.io/controller-runtime v0.21.0
 )
 
 require (
