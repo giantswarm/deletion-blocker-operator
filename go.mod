@@ -7,7 +7,7 @@ toolchain go1.21.5
 require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/microerror v0.4.1
-	github.com/go-logr/logr v1.4.2
+	github.com/go-logr/logr v1.4.3
 	github.com/pkg/errors v0.9.1
 	k8s.io/apimachinery v0.29.2
 	k8s.io/client-go v0.29.2
