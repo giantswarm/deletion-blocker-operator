@@ -40,7 +40,7 @@ func (r *RuleReconciler) Reconcile(ctx context.Context, req reconcile.Request) (
 
 	managed := &unstructured.Unstructured{}
 	managed.SetGroupVersionKind(r.DeletionBlockRule.Managed.GetSchemaGroupVersionKind())
-	if err := r.Client.Get(ctx, req.NamespacedName, managed); err != nil {
+	if err := r.Get(ctx, req.NamespacedName, managed); err != nil {
 		return reconcile.Result{}, errors.Wrap(IgnoreNotFound(err), "cannot get Rule ")
 	}
 
@@ -57,7 +57,7 @@ func (r *RuleReconciler) reconcileNormal(ctx context.Context, logger logr.Logger
 	// If the managed resource doesn't have the finalizer, add it.
 	if !controllerutil.ContainsFinalizer(managed, r.Finalizer) {
 		controllerutil.AddFinalizer(managed, r.Finalizer)
-		if err := r.Client.Update(ctx, managed); err != nil {
+		if err := r.Update(ctx, managed); err != nil {
 			return reconcile.Result{}, microerror.Mask(err)
 		}
 	}
@@ -73,7 +73,7 @@ func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger
 
 	dependents := &unstructured.UnstructuredList{}
 	dependents.SetGroupVersionKind(r.DeletionBlockRule.Dependent.GetSchemaGroupVersionKind())
-	if err := r.Client.List(ctx, dependents, &client.ListOptions{Namespace: managed.GetNamespace()}); err != nil {
+	if err := r.List(ctx, dependents, &client.ListOptions{Namespace: managed.GetNamespace()}); err != nil {
 		return reconcile.Result{}, microerror.Mask(IgnoreNotFound(err))
 	}
 
@@ -84,7 +84,7 @@ func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger
 	if allowed {
 		logger.Info("Deletion is allowed. Removing the finalizer.")
 		controllerutil.RemoveFinalizer(managed, r.Finalizer)
-		if err := r.Client.Update(ctx, managed); err != nil {
+		if err := r.Update(ctx, managed); err != nil {
 			return reconcile.Result{}, microerror.Mask(err)
 		}
 		return ctrl.Result{}, nil
