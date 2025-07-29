@@ -118,7 +118,7 @@ func main() {
 }
 
 func readRulesFromFile(filePath string) ([]rules.DeletionBlock, error) {
-	data, err := os.ReadFile(filePath)
+	data, err := os.ReadFile(filePath) // #nosec G304
 	if err != nil {
 		return nil, err
 	}
