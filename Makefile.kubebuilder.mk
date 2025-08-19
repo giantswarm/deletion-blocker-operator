@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= quay.io/erkanerolgs/deletion-blocker-operator:v2
+IMG ?= gsoci.azurecr.io/erkanerolgs/deletion-blocker-operator:v2
 
 # ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
 ENVTEST_K8S_VERSION = 1.23
