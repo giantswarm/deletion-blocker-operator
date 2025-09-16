@@ -68,15 +68,18 @@ func (r *RuleReconciler) reconcileNormal(ctx context.Context, logger logr.Logger
 
 func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger, managed *unstructured.Unstructured) (reconcile.Result, error) {
 	if !controllerutil.ContainsFinalizer(managed, r.Finalizer) {
+		logger.Info("It does not contain the finalizer, skipping.")
 		return ctrl.Result{}, nil
 	}
 
+	logger.Info("Fetching dependents.")
 	dependents := &unstructured.UnstructuredList{}
 	dependents.SetGroupVersionKind(r.DeletionBlockRule.Dependent.GetSchemaGroupVersionKind())
 	if err := r.List(ctx, dependents, &client.ListOptions{Namespace: managed.GetNamespace()}); err != nil {
 		return reconcile.Result{}, microerror.Mask(IgnoreNotFound(err))
 	}
 
+	logger.Info("Checking if deletion is allowed.")
 	allowed, err := r.DeletionBlockRule.CheckIsDeletionAllowed(*managed, *dependents)
 	if err != nil {
 		return reconcile.Result{}, microerror.Mask(IgnoreNotFound(err))
