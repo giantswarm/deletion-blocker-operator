@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Change container image registry in Makefile to `gsoci.azurecr.io`
+- Use static `finalizer` instead of creating a dynamic `finalizer` based on the rule contents.
 
 ## [0.3.1] - 2024-11-07
 
