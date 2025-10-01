@@ -28,10 +28,10 @@ type RuleReconciler struct {
 	Scheme *runtime.Scheme
 
 	DeletionBlockRule rules.DeletionBlock
-	Finalizer         string
+	legacyFinalizer   string
 }
 
-const finalizerPrefix = "deletion-blocker-operator.finalizers.giantswarm.io"
+const Finalizer = "deletion-blocker-operator.finalizers.giantswarm.io"
 
 func (r *RuleReconciler) Reconcile(ctx context.Context, req reconcile.Request) (reconcile.Result, error) {
 	logger := log.FromContext(ctx)
@@ -55,8 +55,8 @@ func (r *RuleReconciler) Reconcile(ctx context.Context, req reconcile.Request) (
 
 func (r *RuleReconciler) reconcileNormal(ctx context.Context, logger logr.Logger, managed *unstructured.Unstructured) (reconcile.Result, error) {
 	// If the managed resource doesn't have the finalizer, add it.
-	if !controllerutil.ContainsFinalizer(managed, r.Finalizer) {
-		controllerutil.AddFinalizer(managed, r.Finalizer)
+	if !controllerutil.ContainsFinalizer(managed, r.legacyFinalizer) && !controllerutil.ContainsFinalizer(managed, Finalizer) {
+		controllerutil.AddFinalizer(managed, Finalizer)
 		if err := r.Update(ctx, managed); err != nil {
 			return reconcile.Result{}, microerror.Mask(err)
 		}
@@ -67,7 +67,8 @@ func (r *RuleReconciler) reconcileNormal(ctx context.Context, logger logr.Logger
 }
 
 func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger, managed *unstructured.Unstructured) (reconcile.Result, error) {
-	if !controllerutil.ContainsFinalizer(managed, r.Finalizer) {
+	if !controllerutil.ContainsFinalizer(managed, r.legacyFinalizer) && !controllerutil.ContainsFinalizer(managed, Finalizer) {
+		logger.Info("It does not contain the finalizer, skipping.")
 		return ctrl.Result{}, nil
 	}
 
@@ -83,7 +84,8 @@ func (r *RuleReconciler) reconcileDelete(ctx context.Context, logger logr.Logger
 	}
 	if allowed {
 		logger.Info("Deletion is allowed. Removing the finalizer.")
-		controllerutil.RemoveFinalizer(managed, r.Finalizer)
+		controllerutil.RemoveFinalizer(managed, r.legacyFinalizer)
+		controllerutil.RemoveFinalizer(managed, Finalizer)
 		if err := r.Update(ctx, managed); err != nil {
 			return reconcile.Result{}, microerror.Mask(err)
 		}
@@ -106,7 +108,7 @@ func IgnoreNotFound(err error) error {
 
 // SetupWithManager sets up the controller with the Manager.
 func (r *RuleReconciler) SetupWithManager(mgr ctrl.Manager) error {
-	r.Finalizer = buildUniqueFinalizer(r.DeletionBlockRule)
+	r.legacyFinalizer = buildUniqueFinalizer(r.DeletionBlockRule)
 	u := &unstructured.Unstructured{}
 	u.SetGroupVersionKind(r.DeletionBlockRule.Managed.GetSchemaGroupVersionKind())
 	return ctrl.NewControllerManagedBy(mgr).
@@ -118,5 +120,5 @@ func buildUniqueFinalizer(rule rules.DeletionBlock) string {
 	ruleAsYaml, _ := yaml.Marshal(rule)
 	hash := sha256.Sum256(ruleAsYaml)
 	suffix := string(hash[0:4])
-	return fmt.Sprintf("%s.%x", finalizerPrefix, suffix)
+	return fmt.Sprintf("%s.%x", Finalizer, suffix)
 }
