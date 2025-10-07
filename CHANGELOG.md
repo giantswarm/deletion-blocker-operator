@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed
+
+- Remove code that took care of removing finalizer from CAPA CRs.
+
 ## [0.5.0] - 2025-10-07
 
 ### Changed

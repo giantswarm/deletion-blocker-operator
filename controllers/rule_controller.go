@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/ghodss/yaml"
@@ -55,31 +54,6 @@ func (r *RuleReconciler) Reconcile(ctx context.Context, req reconcile.Request) (
 }
 
 func (r *RuleReconciler) reconcileNormal(ctx context.Context, logger logr.Logger, managed *unstructured.Unstructured) (reconcile.Result, error) {
-	// We are removing this controller from CAPA MCs, so we want to remove the finalizer from all reconciled CAPA CRs
-	if managed.GetKind() == "AWSMachineTemplate" {
-		logger.Info("Detected AWSMachineTemplate, removing all finalizers containing the Finalizer constant")
-		finalizersRemoved := false
-		currentFinalizers := managed.GetFinalizers()
-		newFinalizers := []string{}
-
-		for _, finalizer := range currentFinalizers {
-			if strings.Contains(finalizer, Finalizer) {
-				logger.Info("Removing finalizer", "finalizer", finalizer)
-				finalizersRemoved = true
-			} else {
-				newFinalizers = append(newFinalizers, finalizer)
-			}
-		}
-
-		if finalizersRemoved {
-			managed.SetFinalizers(newFinalizers)
-			if err := r.Update(ctx, managed); err != nil {
-				return reconcile.Result{}, microerror.Mask(err)
-			}
-		}
-		return reconcile.Result{}, nil
-	}
-
 	// If the managed resource doesn't have the finalizer, add it.
 	if !controllerutil.ContainsFinalizer(managed, r.legacyFinalizer) && !controllerutil.ContainsFinalizer(managed, Finalizer) {
 		controllerutil.AddFinalizer(managed, Finalizer)
