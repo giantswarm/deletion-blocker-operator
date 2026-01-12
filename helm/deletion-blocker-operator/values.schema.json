@@ -74,21 +74,6 @@
                 }
             }
         },
-        "project": {
-            "type": "object",
-            "properties": {
-                "branch": {
-                    "type": "string"
-                },
-                "commit": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "branch",
-                "commit"
-            ]
-        },
         "registry": {
             "type": "object",
             "properties": {
@@ -168,6 +153,9 @@
                 "allowPrivilegeEscalation": {
                     "type": "boolean"
                 },
+                "readOnlyRootFilesystem": {
+                    "type": "boolean"
+                },
                 "capabilities": {
                     "type": "object",
                     "properties": {
@@ -194,7 +182,6 @@
         "image",
         "logLevel",
         "pod",
-        "project",
         "registry",
         "rules"
     ]

@@ -1,9 +1,11 @@
+apiVersion: v2
 name: deletion-blocker-operator
-version: [[ .Version ]]
+version: 0.6.1-dev
+appVersion: 0.6.1-dev
 description: "An helper operator to block deletion of k8s objects by managing finalizers based on some defined rules"
-appVersion: "[[ .AppVersion ]]"
 home: "https://github.com/giantswarm/deletion-blocker-operator"
-apiVersion: v1
+icon: https://s.giantswarm.io/app-icons/giantswarm/1/dark.svg
 annotations:
   application.giantswarm.io/team: "rocket"
+  io.giantswarm.application.team: "rocket"
   config.giantswarm.io/version: 1.x.x
