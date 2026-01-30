@@ -1,7 +1,7 @@
 apiVersion: v2
 name: deletion-blocker-operator
-version: 0.6.1-dev
-appVersion: 0.6.1-dev
+version: 0.6.1
+appVersion: 0.6.1
 description: "An helper operator to block deletion of k8s objects by managing finalizers based on some defined rules"
 home: "https://github.com/giantswarm/deletion-blocker-operator"
 icon: https://s.giantswarm.io/app-icons/giantswarm/1/dark.svg
