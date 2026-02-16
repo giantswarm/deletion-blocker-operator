@@ -32,7 +32,7 @@ Image tag helper
 {{- if .Values.image.tag }}
 {{- .Values.image.tag }}
 {{- else }}
-{{- .Chart.Version }}
+{{- .Chart.AppVersion }}
 {{- end }}
 {{- end -}}
 
