@@ -19,7 +19,7 @@ Common labels
 {{- define "labels.common" -}}
 app: {{ include "name" . | quote }}
 {{ include "labels.selector" . }}
-application.giantswarm.io/team: {{ index .Chart.Annotations "application.giantswarm.io/team" | quote }}
+io.giantswarm.application.team: {{ index .Chart.Annotations "io.giantswarm.application.team" | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 helm.sh/chart: {{ include "chart" . | quote }}

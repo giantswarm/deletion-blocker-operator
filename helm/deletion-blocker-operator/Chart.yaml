@@ -6,6 +6,5 @@ description: "An helper operator to block deletion of k8s objects by managing fi
 home: "https://github.com/giantswarm/deletion-blocker-operator"
 icon: https://s.giantswarm.io/app-icons/giantswarm/1/dark.svg
 annotations:
-  application.giantswarm.io/team: "rocket"
   io.giantswarm.application.team: "rocket"
   config.giantswarm.io/version: 1.x.x
