@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Update golang docker tag to v1.26.3.
+
 ## [0.6.2] - 2026-02-17
 
 ### Chanaged
