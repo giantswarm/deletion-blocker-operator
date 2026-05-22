@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Update golang docker tag to v1.26.3.
 - Update go toolchain directive to v1.26.3.
+- Update module k8s.io/apimachinery to v0.36.1.
+- Update module k8s.io/client-go to v0.36.1.
+- Update module sigs.k8s.io/controller-runtime to v0.24.1.
 
 ## [0.6.2] - 2026-02-17
 
