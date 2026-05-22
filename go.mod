@@ -2,7 +2,7 @@ module github.com/giantswarm/deletion-blocker-operator
 
 go 1.26.0
 
-toolchain go1.26.2
+toolchain go1.26.3
 
 require (
 	github.com/ghodss/yaml v1.0.0
