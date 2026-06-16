@@ -68,3 +68,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.2 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
 )
+
+replace go.opentelemetry.io/otel/sdk v1.40.0 => go.opentelemetry.io/otel/sdk v1.44.0
+
+replace golang.org/x/crypto v0.47.0 => golang.org/x/crypto v0.53.0
