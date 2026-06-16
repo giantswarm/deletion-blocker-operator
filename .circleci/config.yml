@@ -9,7 +9,7 @@ workflows:
     - architect/go-build:
         context: architect
         name: go-build
-        binary: deletion-blocker-operator
+        binary: manager
         resource_class: xlarge
         filters:
           tags:

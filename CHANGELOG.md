@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Remove superfluous build steps from the Dockerfile.
+- Add a Dockerfile for local development and testing.
+
 ## [0.7.0] - 2026-05-22
 
 ### Changed
