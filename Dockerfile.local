@@ -1,7 +1,7 @@
 # This Dockerfile can be used to build a local image for testing purposes. It is not used by CI to build images which are pushed to a registry.
 
 # Build the manager binary
-FROM golang:1.26.4 as builder
+FROM golang:1.26.5 as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
