@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Remove superfluous build steps from the Dockerfile.
 - Add a Dockerfile for local development and testing.
+- chore(deps): update go toolchain directive to v1.26.5
 
 ## [0.7.0] - 2026-05-22
 
