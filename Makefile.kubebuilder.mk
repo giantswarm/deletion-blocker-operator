@@ -2,8 +2,8 @@
 # Image URL to use all building/pushing image targets
 IMG ?= gsoci.azurecr.io/erkanerolgs/deletion-blocker-operator:v2
 
-# ENVTEST_K8S_VERSION refers to the version of kubebuilder assets to be downloaded by envtest binary.
-ENVTEST_K8S_VERSION = 1.23
+# ENVTEST_K8S_VERSION is defined in Makefile.custom.mk, which is parsed before
+# this file. Do not redefine it here: a plain `=` assignment would silently win.
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -50,5 +50,3 @@ docker-build: ## Build docker image with the manager.
 .PHONY: docker-push
 docker-push: ## Push docker image with the manager.
 	docker push ${IMG}
-
-

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Local-only integration tests, run with `make test-integration`. They exercise the
+  reconciler against a real API server started by envtest. The `integration` build
+  tag keeps them out of CI.
+
 ### Changed
 
 - Remove superfluous build steps from the Dockerfile.
