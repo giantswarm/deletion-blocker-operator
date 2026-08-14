@@ -1,0 +1,30 @@
+---
+# Minimal stub of the Cluster API Provider OpenStack OpenStackMachineTemplate
+# CRD, for envtest only. See test/crd/README.md. Never apply this to a real
+# cluster.
+#
+# Only v1alpha5 is defined, because that is the version pinned by the second rule
+# in config/examples/rules.yaml. Keeping the stub on the same version the
+# operator is configured for is deliberate: it proves the reconciler resolves a
+# non-v1beta1 GVK through the RESTMapper.
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: openstackmachinetemplates.infrastructure.cluster.x-k8s.io
+spec:
+  group: infrastructure.cluster.x-k8s.io
+  names:
+    kind: OpenStackMachineTemplate
+    listKind: OpenStackMachineTemplateList
+    plural: openstackmachinetemplates
+    singular: openstackmachinetemplate
+  scope: Namespaced
+  versions:
+    - name: v1alpha5
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          description: Test-only permissive stub of OpenStackMachineTemplate.
+          type: object
+          x-kubernetes-preserve-unknown-fields: true
