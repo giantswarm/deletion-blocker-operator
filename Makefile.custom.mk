@@ -5,8 +5,7 @@
 # keeps the LAST recipe defined for a target, so nothing here can override those
 # files. That is why the suite below is `test-integration` and not `test`.
 #
-# The integration tests are LOCAL ONLY. They are gated behind the `integration`
-# build tag. CI runs a plain `go test ./...`, so it never compiles them.
+# The integration tests are gated behind the `integration` build tag.
 
 ##@ Integration tests
 
