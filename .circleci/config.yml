@@ -11,7 +11,7 @@ workflows:
         name: go-build
         binary: manager
         resource_class: xlarge
-        test_target: integration-test
+        test_target: test-integration
         filters:
           tags:
             only: /^v.*/
