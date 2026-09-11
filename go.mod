@@ -8,7 +8,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/giantswarm/microerror v0.4.1
 	github.com/go-logr/logr v1.4.4
-	github.com/onsi/gomega v1.39.0
+	github.com/onsi/gomega v1.43.0
 	github.com/pkg/errors v0.9.1
 	k8s.io/api v0.36.3
 	k8s.io/apimachinery v0.36.3
@@ -49,7 +49,7 @@ require (
 	go.uber.org/zap v1.27.1 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/net v0.49.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/oauth2 v0.34.0 // indirect
 	golang.org/x/sync v0.22.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
