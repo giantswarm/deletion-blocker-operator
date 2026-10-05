@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a Dockerfile for local development and testing.
 - chore(deps): update go toolchain directive to v1.26.5
 - Run integration tests in CI.
+- Update architect to v10.12.0 (giantswarm/deletion-blocker-operator#309)
 
 ## [0.7.0] - 2026-05-22
 
