@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Run integration tests in CI.
 - Update architect to v10.12.0 (giantswarm/deletion-blocker-operator#309)
 - Update architect to v10.12.2 (giantswarm/deletion-blocker-operator#311)
+- Update architect to v10.14.10 (giantswarm/deletion-blocker-operator#316)
 
 ## [0.7.0] - 2026-05-22
 
