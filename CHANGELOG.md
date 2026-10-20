@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - The `helm.sh/chart` label is valid for long chart versions: the 63-character cut trims the whole trailing run of `-`, `.` and `_`.
+- Bump `golang.org/x/net` to v0.60.0 to fix GO-2026-6603, GO-2026-6610, GO-2026-6611, GO-2026-6612 and GO-2026-6617.
 
 ### Added
 
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Run integration tests in CI.
 - Update architect to v10.12.0 (giantswarm/deletion-blocker-operator#309)
 - Update architect to v10.12.2 (giantswarm/deletion-blocker-operator#311)
+- Update architect to v10.14.10 (giantswarm/deletion-blocker-operator#316)
 
 ## [0.7.0] - 2026-05-22
 
