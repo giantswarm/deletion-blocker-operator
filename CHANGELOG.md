@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update architect to v10.12.2 (giantswarm/deletion-blocker-operator#311)
 - Update architect to v10.14.10 (giantswarm/deletion-blocker-operator#316)
 - Update architect to v10.14.18 (giantswarm/deletion-blocker-operator#318)
+- Update architect to v10.16.7 (giantswarm/deletion-blocker-operator#323)
 
 ## [0.7.0] - 2026-05-22
 
